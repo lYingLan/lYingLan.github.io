@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            <%- theme.title %>
+        </title>
+        <meta charset="utf-8">
+        <%- css('css/main.css') %>
+        <!-- 图片字体库 -->
+        <%- css('lib/font-awesome/css/font-awesome.min.css') %>
+        <!-- 代码高亮库 -->
+         <%- css('lib/highlight/styles/atom-one-dark.css') %>
+    </head>
+<body>
+
+    <div id="main">
+        <aside id="aside">
+            <%- include('aside.ejs') %>
+        </aside>
+    
+        <nav>
+            <%- include('nav.ejs') %>
+        </nav>
+
+        <div id="content">
+            <div id="article">
+            <%- body %>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入代码高亮的 js -->
+    <%- js('/lib/highlight/highlight.min.js') %>
+
+    <!-- 引入 jquery -->
+    <%- js('/lib/jquery-3.7.1.min.js') %>
+
+    <!-- 引入 pjax -->
+    <%- js('/lib/jquery.pjax.js') %>
+    
+    <!-- 引入 js 文件 -->
+    <%- js('js/main.js') %>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>
+
+

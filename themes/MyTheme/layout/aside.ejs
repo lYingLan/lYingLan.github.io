@@ -1,0 +1,108 @@
+<!-- 侧边栏 -->
+<div id="sidebar">
+
+    <!-- 侧边栏图像 -->
+    <div id="sidebar-image">
+        <a href="/">
+            <img src="/image/log.png" style="height: 50px; width: 50px;border-radius: 50%;" alt="sidebar image" />
+        </a>
+    </div>
+    <div style="font-weight: 900;margin-left: 20px;color: white;margin-top: 30px;">
+        <h3>电子科技大学</h3>
+    </div>
+    <div style="font-weight: 900;margin-left: 20px;color: white;margin-top: 30px;">
+        <h3>前沿人工智能与复杂系统实验室</h3>
+    </div>
+    <!-- 侧边目录栏 -->
+    <div id="tree">
+        <%
+            // 自定义排序顺序
+            const customOrder = ["home", "miscellaneous", "research", "software", "opportunities", "publications"];
+
+            // 将路径转换成 tree 目录结构
+            const pathToTree = (input) => {
+                var output = [];
+                input.forEach(function(post){
+                    var chain = post.slug.split("/");
+                    var currentNode = output;
+                    for (var j = 0; j < chain.length; j++) {
+                        if (chain[j] === '') {
+                            break;
+                        }
+                        var wantedNode = chain[j];
+                        var lastNode = currentNode;
+
+                        for (var k = 0; k < currentNode.length; k++) {
+                            if (currentNode[k].title == wantedNode) {
+                                currentNode = currentNode[k].children;
+                                break;
+                            }
+                        }
+
+                        if (lastNode == currentNode) {
+                            var newNode = currentNode[k] = { post: post, title: wantedNode, children: [] };
+                            currentNode = newNode.children;
+                        } else {
+                            delete currentNode.children;
+                        }
+                    }
+                });
+
+                return output;
+            }
+
+            // 根据 customOrder 排序
+            const sortByOrder = (nodes) => {
+                return nodes.sort((a, b) => {
+                    const indexA = customOrder.indexOf(a.title.toLowerCase());
+                    const indexB = customOrder.indexOf(b.title.toLowerCase());
+
+                    if (indexA === -1) return 1; // 如果 title 不在 customOrder 中，排到最后
+                    if (indexB === -1) return -1; // 如果 title 不在 customOrder 中，排到最后
+
+                    return indexA - indexB;
+                }).map(node => {
+                    if (node.children) {
+                        node.children = sortByOrder(node.children);
+                    }
+                    return node;
+                });
+            };
+
+            // 递归输出侧边栏目录 tree
+            const showTree = (input) => {
+                input = sortByOrder(input); // 使用排序函数
+
+                input.forEach(function(node) {
+                    if (node.children.length === 0) {
+        %>
+                    <ul>
+                        <li class="file<%- (is_post() && node.post._id == page._id) ? ' active' : '' %>">
+                            <a href="<%- config.root %><%- node.post.path %>">
+                                <!-- <i class="fa fa-file"></i> -->
+                                <%- node.title %>
+                            </a>
+                        </li>
+                    </ul>
+        <%
+                    } else {
+        %>
+                    <ul>
+                        <li class="directory">
+                            <a href="#" class="directory">
+                                <!-- <i class="fa fa-folder"></i> -->
+                                <%- node.title %>
+                            </a>
+                            <%- showTree(node.children) %>
+                        </li>
+                    </ul>
+        <%
+                    }
+                });
+            }
+
+            showTree(pathToTree(site.posts));
+        %>
+    </div>
+
+</div>
